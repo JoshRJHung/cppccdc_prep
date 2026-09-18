@@ -46,6 +46,16 @@ change_password() {
     NEW_PASS=""
 }
 
+# ---Main---
+require_root
+change_password root
+
+login_user="$(getent passwd 1000 | cut -d: -f1 || true)"
+if [[-n "$login_user" ]]; then
+      change_password "$login_user"
+else
+      echo "No default user found" >&2
+fi
 
 # Human accounts: UID >= 1000 with a real login shell (excludes nobody)
 #list_login_users() {
