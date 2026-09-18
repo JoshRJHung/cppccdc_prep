@@ -49,6 +49,11 @@ change_password() {
     NEW_PASS=""
 }
 
+#Step 2: List Open Ports
+list_open_ports() {
+     ss -tulpn
+}
+
 # ---Main---
 require_root
 change_password root
@@ -60,42 +65,5 @@ else
       echo "No default user found" >&2
 fi
 
-# Human accounts: UID >= 1000 with a real login shell (excludes nobody)
-#list_login_users() {
-#    awk -F: '$3 >= 1000 && $1 != "nobody" && $7 !~ /(nologin|false)$/ {print $1}' /etc/passwd
-#}
+list_open_ports
 
-#change_passwords() {
-#    echo "=== Step 1: Change passwords ==="
-#    backup_auth_files
-
-#    read -rp "Change root password? [Y/n] " ans
-#    if [[ ! "$ans" =~ ^[Nn]$ ]]; then
-#        change_password root
-#    fi
-
-#    local users
-#    mapfile -t users < <(list_login_users)
-#    if [[ ${#users[@]} -eq 0 ]]; then
-#        echo "[*] No login users with UID >= 1000 found."
-#        return
-#    fi
-
-#    echo "[*] Login users found: ${users[*]}"
-#    for u in "${users[@]}"; do
-#        read -rp "Change password for '$u'? [Y/n/q to stop] " ans
-#        case "$ans" in
-#            [Qq]) break ;;
-#            [Nn]) continue ;;
-#            *)    change_password "$u" ;;
-#        esac
-#    done
-#}
-
-#main() {
-#    require_root
-#    change_passwords
-    # Future steps: open ports, passwd/shadow/group/sudoers, cron, PAM, bashrc, SUID
-#}
-
-#main "$@"
