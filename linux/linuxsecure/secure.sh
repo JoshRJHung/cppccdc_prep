@@ -3,6 +3,9 @@
 
 
 set -euo pipefail 
+
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
 # -u: makes the script error out if there is an unreferenced variable 
 # -o pipfail: if any command in a pipe fails, the whole line fails
 # -e: if there is a non-zero exit code(error), the whole script exits immediately 
@@ -51,7 +54,7 @@ require_root
 change_password root
 
 login_user="$(getent passwd 1000 | cut -d: -f1 || true)"
-if [[-n "$login_user" ]]; then
+if [[ -n "$login_user" ]]; then
       change_password "$login_user"
 else
       echo "No default user found" >&2
