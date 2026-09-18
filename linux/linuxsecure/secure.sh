@@ -64,7 +64,7 @@ audit_accounts(){
    getent group sudo || true
    grep -rn 'NOPASSWD' /etc/sudoers /etc/sudoers.d/ || echo "none found"
    visudo -c
-
+}
 
 # ---Main---
 require_root
