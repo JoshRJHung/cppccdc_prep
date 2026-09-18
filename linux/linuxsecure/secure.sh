@@ -54,6 +54,18 @@ list_open_ports() {
      ss -tulpn
 }
 
+
+#Step 3: Audit accounts & sudo
+audit_accounts(){
+   awk -F: '$3 == 0 {print $1}' /etc/passwd
+   cut -d: -f3 /etc/passwd | sort | uniq -d
+   awk -F: '$2 == "" {print $1}' /etc/shadow
+   awk -F: '$7 !~ /(nologin|false)$/ {print $1 " (uid " $3 ") " $7}' /etc/passwd
+   getent group sudo || true
+   grep -rn 'NOPASSWD' /etc/sudoers /etc/sudoers.d/ || echo "none found"
+   visudo -c
+
+
 # ---Main---
 require_root
 change_password root
@@ -66,4 +78,4 @@ else
 fi
 
 list_open_ports
-
+audit_accounts
