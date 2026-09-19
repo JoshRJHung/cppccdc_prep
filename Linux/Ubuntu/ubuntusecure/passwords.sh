@@ -1,14 +1,13 @@
 #!/bin/bash
-# Linux Hardening Script
+#Change default user and root passwords
 
-
-set -euo pipefail 
+set -euo pipefail
 
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
-# -u: makes the script error out if there is an unreferenced variable 
+# -u: makes the script error out if there is an unreferenced variable
 # -o pipfail: if any command in a pipe fails, the whole line fails
-# -e: if there is a non-zero exit code(error), the whole script exits immediately 
+# -e: if there is a non-zero exit code(error), the whole script exits immediately
 
 require_root() {
     if [[ $EUID -ne 0 ]]; then
@@ -17,7 +16,6 @@ require_root() {
     fi
 }
 
-#Step 1:Change user/root default creds
 
 # Prompt twice (hidden), retry until they match and are non-empty.
 # Result is stored in the global NEW_PASS.
@@ -49,24 +47,7 @@ change_password() {
     NEW_PASS=""
 }
 
-#Step 2: List Open Ports
-list_open_ports() {
-     ss -tulpn
-}
-
-
-#Step 3: Audit accounts & sudo
-audit_accounts(){
-   awk -F: '$3 == 0 {print $1}' /etc/passwd
-   cut -d: -f3 /etc/passwd | sort | uniq -d
-   awk -F: '$2 == "" {print $1}' /etc/shadow
-   awk -F: '$7 !~ /(nologin|false)$/ {print $1 " (uid " $3 ") " $7}' /etc/passwd
-   getent group sudo || true
-   grep -rn 'NOPASSWD' /etc/sudoers /etc/sudoers.d/ || echo "none found"
-   visudo -c
-}
-
-# ---Main---
+#---Main---
 require_root
 change_password root
 
@@ -76,6 +57,3 @@ if [[ -n "$login_user" ]]; then
 else
       echo "No default user found" >&2
 fi
-
-list_open_ports
-audit_accounts
